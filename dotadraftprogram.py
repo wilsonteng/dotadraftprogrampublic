@@ -10,8 +10,11 @@ steam_api_key = "1234"
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
 numberOfMatches = int(input("Enter number of matches on this printout. Each Page fits 6 drafts. Default Value is 12: ") or "12")
 
-#creates dictionary of hero images and hero names. API key is written into there
+
 def get_imageDict():
+    """
+    Creates dictionary of hero images and hero names. Requires API Key
+    """
     r = requests.get(f"https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?key={steam_api_key}&language=en")
     b = json.loads(r.text)['result']['heroes']
     
@@ -23,9 +26,10 @@ def get_imageDict():
                                     'icon' : "/static/images/miniheroes/" + hero['name'][14::]  + ".png" }
     return heroImageDict
 
-#returns list of matchids. Quantity: 'numberOfMatches'. Team: 'teamid'
 def get_matchids():
-
+    """
+    Returns list of matchids. Quantity: 'numberOfMatches'. Team: 'teamid'
+    """
     matchList = []
     recentTeamMatches = (requests.get("https://api.opendota.com/api/teams/" + str(teamid) + "/matches")).json()[:numberOfMatches]    
     for match in recentTeamMatches:
@@ -33,9 +37,11 @@ def get_matchids():
 
     return matchList
 
-#returns dictionary with match information. dictionary format is as provided by opendota.
-def get_match_info(matchid):
 
+def get_match_info(matchid):
+    """
+    Returns dictionary with match information. dictionary format is as provided by opendota.
+    """
     matchJSON = requests.get("https://api.opendota.com/api/matches/" + str(matchid)).json()
 
     #exit this function call if draft data is missing
@@ -90,9 +96,10 @@ def get_match_info(matchid):
 
     return curMatch
 
-#returns draft information in 4 dictionaries
 def get_picks_bans(picks_bans, isTeamARadiant):
-
+    """
+    returns draft information as dictionary
+    """
     radiantpicks, radiantbans, direpicks, direbans = [], [], [], []
     
     for item in picks_bans:
@@ -128,7 +135,9 @@ def get_picks_bans(picks_bans, isTeamARadiant):
     return match_draft
 
 def produceHtmlFile(data):
-
+    """
+    Produces information in HTML format
+    """
     heroImageDict = get_imageDict()
 
     htmlPage = """
@@ -221,8 +230,6 @@ def produceHtmlFile(data):
 
     f.write(htmlPage)
     f.close()
-    
-    #print(htmlBody)
 
 def main():
     print("Getting match list...")
@@ -246,7 +253,6 @@ def main():
     filepath = os.path.abspath(os.getcwd())
     print("File created successfully at: ", str(filepath)+ '/DraftPrintoutBooklet' + teamid + '.html')
     input("Close Window to Exit. Good luck!")
-    #print(allMatchDict)
 
 main()
 
