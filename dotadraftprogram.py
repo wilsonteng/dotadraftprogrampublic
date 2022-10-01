@@ -4,6 +4,7 @@ import requests
 from datetime import datetime
 import os
 
+#Obtain a key from https://steamcommunity.com/dev/apikey
 steam_api_key = "1234"
 
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
