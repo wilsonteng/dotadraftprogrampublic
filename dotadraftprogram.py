@@ -5,11 +5,13 @@ from datetime import datetime
 import os
 
 #Obtain a key from https://steamcommunity.com/dev/apikey
-steam_api_key = "1234"
+steam_api_key = ""
+
+if not steam_api_key:
+    raise Exception("API Key Missing")
 
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
 numberOfMatches = int(input("Enter number of matches on this printout. Each Page fits 6 drafts. Default Value is 12: ") or "12")
-
 
 def get_imageDict():
     """
