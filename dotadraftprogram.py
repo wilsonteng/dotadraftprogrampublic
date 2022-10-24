@@ -5,10 +5,7 @@ from datetime import datetime
 import os
 
 #Obtain a key from https://steamcommunity.com/dev/apikey
-steam_api_key = ""
-
-if not steam_api_key:
-    raise Exception("API Key Missing")
+steam_api_key = "4434A3E660D1569EA1CDF8F7DCC28570"
 
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
 numberOfMatches = int(input("Enter number of matches on this printout. Each Page fits 6 drafts. Default Value is 12: ") or "12")
@@ -18,6 +15,11 @@ def get_imageDict():
     Creates dictionary of hero images and hero names. Requires API Key
     """
     r = requests.get(f"https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?key={steam_api_key}&language=en")
+    if r.ok:
+        print("Steam API Request OK!")
+    else:
+        raise Exception("Problem with Steam API Request. Check your API key.")
+
     b = json.loads(r.text)['result']['heroes']
     
     heroImageDict = {}
