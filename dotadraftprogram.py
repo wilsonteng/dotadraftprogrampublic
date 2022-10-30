@@ -256,6 +256,7 @@ def main():
 
     filepath = os.path.abspath(os.getcwd())
     print("File created successfully at: ", str(filepath)+ '/DraftPrintoutBooklet' + teamid + '.html')
+    print("When printing, set Margins to None and enable Background Graphics")
     input("Close Window to Exit. Good luck!")
 
 main()
