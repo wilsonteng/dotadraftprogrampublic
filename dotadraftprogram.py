@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 
 #Obtain a key from https://steamcommunity.com/dev/apikey
-steam_api_key = "4434A3E660D1569EA1CDF8F7DCC28570"
+steam_api_key = "API KEY HERE"
 
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
 numberOfMatches = int(input("Enter number of matches on this printout. Each Page fits 6 drafts. Default Value is 12: ") or "12")
