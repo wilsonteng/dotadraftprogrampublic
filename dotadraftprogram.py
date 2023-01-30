@@ -2,10 +2,10 @@ import json
 from operator import truediv
 import requests
 from datetime import datetime
-import os
+import pathlib
 
 #Obtain a key from https://steamcommunity.com/dev/apikey
-steam_api_key = "API KEY HERE"
+steam_api_key = "2E80E009149102C3B2E1C41249BDB682"
 
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
 numberOfMatches = int(input("Enter number of matches on this printout. Each Page fits 6 drafts. Default Value is 12: ") or "12")
@@ -225,15 +225,21 @@ def produceHtmlFile(data):
 
         htmlBody += ' </div></div></div></div>\n' #close bans row, team draft, draft, and match divs
 
-    
-    f = open('DraftPrintoutBooklet' + teamid + '.html','w')
-
-    
     htmlPage += htmlBody
     htmlPage += """</body></html>"""
+    
+    date = datetime.today().strftime('%Y-%m-%d')
+    filename = f'DraftPrintout{str(teamid)}--{date}.html'
+    filedir = pathlib.Path.cwd() / 'output'
+    filedir.mkdir(mode=0o777, parents=True, exist_ok=True)
+    filepath = filedir / filename
+    print(filepath)
 
+    f = open(filepath,'w')
     f.write(htmlPage)
     f.close()
+    return filepath
+
 
 def main():
     print("Getting match list...")
@@ -252,10 +258,9 @@ def main():
             print("Warning: Match Data missing for ", id, ". Please check obtain this match data manually.")
             allMatchDict.pop(id)
 
-    produceHtmlFile(allMatchDict)
+    filepath = produceHtmlFile(allMatchDict)
 
-    filepath = os.path.abspath(os.getcwd())
-    print("File created successfully at: ", str(filepath)+ '/DraftPrintoutBooklet' + teamid + '.html')
+    print(f"File created successfully at: {filepath}")
     print("When printing, set Margins to None and enable Background Graphics")
     input("Close Window to Exit. Good luck!")
 
