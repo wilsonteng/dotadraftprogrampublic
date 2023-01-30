@@ -5,7 +5,7 @@ from datetime import datetime
 import pathlib
 
 #Obtain a key from https://steamcommunity.com/dev/apikey
-steam_api_key = "2E80E009149102C3B2E1C41249BDB682"
+steam_api_key = "API KEY HERE"
 
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
 numberOfMatches = int(input("Enter number of matches on this printout. Each Page fits 6 drafts. Default Value is 12: ") or "12")
