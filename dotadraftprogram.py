@@ -2,10 +2,10 @@ import json
 from operator import truediv
 import requests
 from datetime import datetime
-import pathlib
+from pathlib import Path
 
 #Obtain a key from https://steamcommunity.com/dev/apikey
-steam_api_key = "YOUR API KEY HERE"
+steam_api_key = "API KEY HERE"
 
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
 numberOfMatches = int(input("Enter number of matches on this printout. Each Page fits 6 drafts. Default Value is 12: ") or "12")
@@ -22,13 +22,13 @@ def get_imageDict():
 
     b = json.loads(r.text)['result']['heroes']
     
-    heroImageDict = {}
+    hero_image_dict = {}
     for hero in b:
-        heroImageDict[hero['id']] = {'hero': hero['localized_name'] , 
+        hero_image_dict[hero['id']] = {'hero': hero['localized_name'] , 
                                     'vert':  "http://cdn.dota2.com/apps/dota2/images/heroes/" + hero['name'][14::] + "_vert.jpg",
                                     'large': "http://cdn.dota2.com/apps/dota2/images/heroes/" + hero['name'][14::]  + "_lg.png" ,
                                     'icon' : "/static/images/miniheroes/" + hero['name'][14::]  + ".png" }
-    return heroImageDict
+    return hero_image_dict
 
 def get_matchids():
     """
@@ -138,11 +138,10 @@ def get_picks_bans(picks_bans, isTeamARadiant):
 
     return match_draft
 
-def produceHtmlFile(data):
+def produceHtmlFile(data, hero_image_dict):
     """
     Produces information in HTML format
     """
-    heroImageDict = get_imageDict()
 
     htmlPage = """
     <!DOCTYPE html>
@@ -193,7 +192,7 @@ def produceHtmlFile(data):
         htmlBody += '<div class ="picks-row">\n'
         for pick in data[match]['draft']['teamApicks']:
             hero_id = pick['hero_id']
-            htmlBody += '<div class="pick"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(heroImageDict[hero_id]["large"]) + '"></div>\n'
+            htmlBody += '<div class="pick"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(hero_image_dict[hero_id]["large"]) + '"></div>\n'
         
         htmlBody += ' </div>\n'
 
@@ -201,7 +200,7 @@ def produceHtmlFile(data):
         htmlBody += '<div class ="bans-row">\n'
         for pick in data[match]['draft']['teamAbans']:
             hero_id = pick['hero_id']
-            htmlBody += '<div class="ban"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(heroImageDict[hero_id]["large"]) + '"></div>\n'
+            htmlBody += '<div class="ban"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(hero_image_dict[hero_id]["large"]) + '"></div>\n'
 
         htmlBody += ' </div></div>\n' #close team draft div and bans row
     
@@ -213,7 +212,7 @@ def produceHtmlFile(data):
         htmlBody += '<div class ="picks-row">\n'
         for pick in data[match]['draft']['teamBpicks']:
             hero_id = pick['hero_id']
-            htmlBody += '<div class="pick"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(heroImageDict[hero_id]["large"]) + '"></div>\n'
+            htmlBody += '<div class="pick"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(hero_image_dict[hero_id]["large"]) + '"></div>\n'
 
         htmlBody += ' </div>\n'
 
@@ -221,7 +220,7 @@ def produceHtmlFile(data):
         htmlBody += '<div class ="bans-row">\n'
         for pick in data[match]['draft']['teamBbans']:
             hero_id = pick['hero_id']
-            htmlBody += '<div class="ban"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(heroImageDict[hero_id]["large"]) + '"></div>\n'
+            htmlBody += '<div class="ban"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(hero_image_dict[hero_id]["large"]) + '"></div>\n'
 
         htmlBody += ' </div></div></div></div>\n' #close bans row, team draft, draft, and match divs
 
@@ -230,7 +229,7 @@ def produceHtmlFile(data):
     
     date = datetime.today().strftime('%Y-%m-%d')
     filename = f'DraftPrintout{str(teamid)}--{date}.html'
-    filedir = pathlib.Path.cwd() / 'output'
+    filedir = Path.cwd() / 'output'
     filedir.mkdir(mode=0o777, parents=True, exist_ok=True)
     filepath = filedir / filename
     print(filepath)
@@ -244,21 +243,22 @@ def produceHtmlFile(data):
 def main():
     print("Getting match list...")
     matchList = get_matchids()
+    hero_image_dict = get_imageDict()
 
     if not matchList:
         print("Error getting matchlist for team id: ", teamid, " Restart program and double check the number.")
         input("Press Enter or Close Window to Exit")
         quit()
 
-    allMatchDict = {}
+    all_match_dict = {}
     for id in matchList:
         print("Getting Match Data For:", id)
-        allMatchDict[id] = get_match_info(id)
-        if allMatchDict[id] == None:
-            print("Warning: Match Data missing for ", id, ". Please check obtain this match data manually.")
-            allMatchDict.pop(id)
+        all_match_dict[id] = get_match_info(id)
+        if all_match_dict[id] == None:
+            print("Warning: Match Data missing for ", id, ". You will need to check if this match exists manually.")
+            all_match_dict.pop(id)
 
-    filepath = produceHtmlFile(allMatchDict)
+    filepath = produceHtmlFile(all_match_dict, hero_image_dict)
 
     print(f"File created successfully at: {filepath}")
     print("When printing, set Margins to None and enable Background Graphics")
