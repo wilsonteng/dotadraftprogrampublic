@@ -5,7 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 #Obtain a key from https://steamcommunity.com/dev/apikey
-steam_api_key = "API KEY HERE"
+steam_api_key = "INSERT API KEY WITHIN QUOTATIONS HERE"
 
 teamid = input("Enter Team ID as number. Ex: Evil Geniuses would be '39': ")
 numberOfMatches = int(input("Enter number of matches on this printout. Each Page fits 6 drafts. Default Value is 12: ") or "12")
@@ -154,11 +154,13 @@ def produceHtmlFile(data, hero_image_dict):
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
         <style>
-        *{font-family:'Open Sans',sans-serif;text-align:left;margin:0;font-size:16px}body{width:21cm;height:27cm;page-break-before:always;padding:0 1cm;position:relative}@page{size:5.5in 8.5in}.draft{width:1400px}.team-draft{width:580px;display:inline-block}.ban,.pick{display:inline-block;position:relative;margin:1px}.sequence{font-size:16px;font-weight:700;position:absolute;z-index:100;padding:1px 2px;color:#fff}.pick .sequence{background-color:#437512}.ban .sequence{background-color:#b50000}.dire,.radiant{display:inline-block}.radiant{color:#92a525}.dire{color:#c23c2a}.match{margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid grey;width:1150px;break-inside:avoid}.team-draft{margin-top:12px}.team-draft p{display:inline-block;vertical-align:middle;margin-bottom:4px}.teamlogo{height:24px;background:#000;padding:1px 4px;margin-right:4px;vertical-align:middle}.pick img{width:107px}.ban img{width:75px;filter:grayscale(100%)}.info-row b{font-weight:900;font-size:21px}
+        *{font-family:'Open Sans',sans-serif;text-align:left;margin:0;font-size:16px}body{width:21cm;height:27cm;padding:0 1cm;position:relative}@page{size:8.5in 11in}.draft{width:1400px}.team-draft{width:580px;display:inline-block}.ban,.pick{display:inline-block;position:relative;margin:1px}.sequence{font-size:16px;font-weight:700;position:absolute;z-index:100;padding:1px 2px;color:#fff}.pick .sequence{background-color:#437512}.ban .sequence{background-color:#b50000}.dire,.radiant{display:inline-block}.radiant{color:#92a525}.dire{color:#c23c2a}.match{margin-bottom:24px;padding-bottom:24px;border-bottom:1px solid grey;width:1150px;break-inside:avoid}.team-draft{margin-top:12px}.team-draft p{display:inline-block;vertical-align:middle;margin-bottom:4px}.teamlogo{height:24px;background:#000;padding:1px 4px;margin-right:4px;vertical-align:middle}.pick img{width:107px}.ban img{width:75px;filter:grayscale(100%)}.info-row b{font-weight:900;font-size:21px}.pagebreak{page-break-after:always}}
         </style>
         <body>
     """
     htmlBody = ""
+    
+    page_break_counter = 0
 
     for match in data:
 
@@ -223,6 +225,12 @@ def produceHtmlFile(data, hero_image_dict):
             htmlBody += '<div class="ban"><div class="sequence">' + str(pick["order"] + 1) + '</div><img alt="" src="' + str(hero_image_dict[hero_id]["large"]) + '"></div>\n'
 
         htmlBody += ' </div></div></div></div>\n' #close bans row, team draft, draft, and match divs
+
+        # page breaks
+        page_break_counter += 1
+        if page_break_counter == 6:
+            htmlBody += '''<div class="pagebreak"></div>'''
+            page_break_counter = 0
 
     htmlPage += htmlBody
     htmlPage += """</body></html>"""
